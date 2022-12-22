@@ -11,12 +11,13 @@ typedef double (*func_ptr)(double*);
 const int var_count = 2;
 
 double function(double* variables);
-double golden_section(func_ptr f, double* vars, int var_index, double eps, double a, double b, int max_steps_count);
-void descent_method(func_ptr f, double* vars, double eps, int max_steps_count);
+double golden_section(func_ptr f, double* vars, int var_index, double eps, double a, double b, size_t max_steps_count);
+void descent_method(func_ptr f, double* vars, double eps, size_t max_steps_count,double* range);
+
 
 int menu();
 int submenu();
-void input_data(double* eps, int* max_steps, double* vars);
+void input_data(double* eps, int* max_steps, double* vars, double* range);
 void about();
 
 int main()
@@ -26,20 +27,20 @@ int main()
     double eps = 0.0;
     int max_steps_count = 0;
     double variables[var_count] = { 0.0 };
-
+    double range[2] = { 0.0 };
     while (int choice = menu())
     {
         switch (choice) {
         case 1:
-            input_data(&eps, &max_steps_count, variables);
+            input_data(&eps, &max_steps_count, variables, range);
             while (int subchoice = submenu())
             {
                 switch (subchoice) {
                 case 1:
-                    input_data(&eps, &max_steps_count, variables);
+                    input_data(&eps, &max_steps_count, variables, range);
                     break;
                 case 2:
-                    descent_method(function, variables, eps, max_steps_count);
+                    descent_method(function, variables, eps, max_steps_count, range);
                     break;
                 default:
                     std::cout << "Неверный выбор. Попробуйте снова." << std::endl;
@@ -60,22 +61,26 @@ int main()
 }
 
 
-double function(double* variables)
+double function(double* vars)
 {
-
-    return pow(25 - variables[0], 2) + pow((variables[1] - 50), 3);
-        /*sin(variables[0] * variables[1]) - cos(variables[1] - variables[0]);*/
+    double x = vars[0];
+    double y = vars[1];
+    double f = 3 * (pow(x, 2) + pow(y, 2)) - pow(x, 3) + 4 * y; /*pow(x-2, 2) + pow((y*3), 2);*/
+        /*sin(x * y) - cos(y - x);*/
+        /*pow(x, 2) + y * x + pow(y, 2) - 3 * y - 12*x;*/        
+        /*pow(x, 4) - y * pow(x, 2) + 600 * x + pow(y, 4) - 1000 * y;*/
+    return f;
 }
 
 
-double golden_section(func_ptr f, double* vars, int var_index, double eps, double a, double b, int max_steps_count)
+double golden_section(func_ptr f, double* vars, int var_index, double eps, double a, double b, size_t max_steps_count)
 {
     double res = 0.0;
     double phi = (1 + sqrt(5.0)) / 2.0;
     double A = 0.0f, B = 0.0f;
     double x1 = a + phi * (b - a), x2 = b - phi * (b - a);
 
-    int step = 0;
+    size_t step = 0;
 
     while ((b - a > eps))
     {
@@ -99,17 +104,18 @@ double golden_section(func_ptr f, double* vars, int var_index, double eps, doubl
     return res;
 }
 
-void descent_method(func_ptr f, double* vars, double eps, int max_steps_count)
+
+void descent_method(func_ptr f, double* vars, double eps, size_t max_steps_count, double* range)
 {
     double B = f(vars), A = 0;
     bool was_counted = false;
     int stpes_ellapsed = 0;
     double delta = 0.0;
-    for (int i = 0; i < max_steps_count; i++) {
+    for (size_t i = 0; i < max_steps_count; i++) {
         A = B;
 
         for (int var_index = 0; var_index < var_count; var_index++)
-            vars[var_index] = golden_section(f, vars, var_index, eps, -5000, 5000, max_steps_count);
+            vars[var_index] = golden_section(f, vars, var_index, eps, range[0], range[1], max_steps_count);
 
         B = f(vars);
 
@@ -123,7 +129,7 @@ void descent_method(func_ptr f, double* vars, double eps, int max_steps_count)
         }
     }
 
-    std::cout << "Результат поиска минимума функции " << "0.5-x1^2 + x2-0.5^2)" << std::endl;
+    std::cout << "Результат поиска минимума функции " << std::endl;
 
     if (!was_counted)
         std::cout << "За максимально указанное количество шагов ( " << max_steps_count << " ) минимум не был посчитан." << std::endl;
@@ -139,7 +145,7 @@ void descent_method(func_ptr f, double* vars, double eps, int max_steps_count)
     }
 
     std::cout << "\b\b" << ")" << std::endl;
-    std::cout << "Значение фукнции f(X): " << std::setprecision(10) << f(vars) << std::endl;
+    std::cout << "Значение функции f(X): " << std::setprecision(10) << f(vars) << std::endl;
 }
 
 int menu()
@@ -172,7 +178,7 @@ int submenu()
     return choice;
 }
 
-void input_data(double* eps, int* max_steps, double* vars)
+void input_data(double* eps, int* max_steps, double* vars, double* range)
 {
     std::cout << "Введите значение погрешности: ";
     std::cin >> *eps;
@@ -180,13 +186,17 @@ void input_data(double* eps, int* max_steps, double* vars)
     double step = 0;
     std::cout << "Введите величину шага: ";
     std::cin >> step;
-
     std::cout << "Введите максимальное количество шагов: ";
     std::cin >> *max_steps;
     for (int i = 0; i < var_count; i++) {
         std::cout << "Введите начальное значение " << i + 1 << " координаты: ";
         std::cin >> vars[i];
     }
+    std::cout << "Введите начало интервала, в котором будет произведен поиск минимума: ";
+    std::cin >> range[0];
+    std::cout << "Введите конец интервала, в котором будет произведен поиск минимума: ";
+    std::cin >> range[1];
+    
     std::cout << std::endl;
 }
 
