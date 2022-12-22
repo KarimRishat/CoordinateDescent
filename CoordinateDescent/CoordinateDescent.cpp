@@ -6,15 +6,17 @@
 #include <iomanip>
 #include <cmath>
 
-typedef double (*func_ptr)(double*);
+typedef long double (*func_ptr)(double*);   //Указатель на функцию
 
 const int var_count = 2;
 
-double function(double* variables);
+long double function(double* variables);    //рассматриваемая функция
+//метод для точки минимума методом золотого сечения
 double golden_section(func_ptr f, double* vars, int var_index, double eps, double a, double b, size_t max_steps_count);
+//метод покоординатного спуска
 void descent_method(func_ptr f, double* vars, double eps, size_t max_steps_count,double* range);
 
-
+//интерфейс программы
 int menu();
 int submenu();
 void input_data(double* eps, int* max_steps, double* vars, double* range);
@@ -24,10 +26,10 @@ int main()
 {
     setlocale(LC_ALL, "RUSSIAN");
 
-    double eps = 0.0;
-    int max_steps_count = 0;
-    double variables[var_count] = { 0.0 };
-    double range[2] = { 0.0 };
+    double eps = 0.0;   //переменная погрешнности
+    int max_steps_count = 0;    //максимальное количество шагов
+    double variables[var_count] = { 0.0 };  //вектор с переменными функции
+    double range[2] = { 0.0 };  //интервал для поиска минимума
     while (int choice = menu())
     {
         switch (choice) {
@@ -60,25 +62,26 @@ int main()
     return 0;
 }
 
-
-double function(double* vars)
+//рассматриваемая функция
+long double function(double* vars)
 {
     double x = vars[0];
     double y = vars[1];
-    double f = 3 * (pow(x, 2) + pow(y, 2)) - pow(x, 3) + 4 * y; /*pow(x-2, 2) + pow((y*3), 2);*/
+    double f = /*3 * (pow(x, 2) + pow(y, 2)) - pow(x, 3) + 4 * y;*/ 
+               /*pow(x-2, 2) + pow((y*3), 2);*/
         /*sin(x * y) - cos(y - x);*/
         /*pow(x, 2) + y * x + pow(y, 2) - 3 * y - 12*x;*/        
-        /*pow(x, 4) - y * pow(x, 2) + 600 * x + pow(y, 4) - 1000 * y;*/
+        pow(x, 4) - y * pow(x, 2) + 600 * x + pow(y, 4) - 1000 * y;
     return f;
 }
 
 
 double golden_section(func_ptr f, double* vars, int var_index, double eps, double a, double b, size_t max_steps_count)
 {
-    double res = 0.0;
-    double phi = (1 + sqrt(5.0)) / 2.0;
-    double A = 0.0f, B = 0.0f;
-    double x1 = a + phi * (b - a), x2 = b - phi * (b - a);
+    double res = 0.0;   //переменная, возвращающая найденную точку
+    double phi = (1 + sqrt(5.0)) / 2.0; //коэффициент золотого сечения
+    long double A = 0.0f, B = 0.0f;
+    double x1 = 0.0, x2 = 0.0;
 
     size_t step = 0;
 
@@ -86,12 +89,12 @@ double golden_section(func_ptr f, double* vars, int var_index, double eps, doubl
     {
         x1 = b - ((b - a) / phi);
         vars[var_index] = x1;
-        A = f(vars);
+        A = f(vars);    //f(x1)
         x2 = a + ((b - a) / phi);
         vars[var_index] = x2;
-        B = f(vars);
+        B = f(vars); //f(x2)
         if (A > B)
-            a = x1;
+            a = x1; //отбрасываем отрезок 
         else
             b = x2;
 
