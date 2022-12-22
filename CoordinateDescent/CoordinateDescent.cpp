@@ -80,7 +80,7 @@ double golden_section(func_ptr f, double* vars, int var_index, double eps, doubl
 {
     double res = 0.0;   //переменная, возвращающая найденную точку
     double phi = (1 + sqrt(5.0)) / 2.0; //коэффициент золотого сечения
-    long double A = 0.0f, B = 0.0f;
+    long double A = 0.0f, B = 0.0f; //f1, f2
     double x1 = 0.0, x2 = 0.0;
 
     size_t step = 0;
@@ -148,7 +148,7 @@ void descent_method(func_ptr f, double* vars, double eps, size_t max_steps_count
     }
 
     std::cout << "\b\b" << ")" << std::endl;
-    std::cout << "Значение функции f(X): " << std::setprecision(10) << f(vars) << std::endl;
+    std::cout << "Значение функции f(X): " << std::setprecision(10) << B << std::endl;
 }
 
 int menu()
