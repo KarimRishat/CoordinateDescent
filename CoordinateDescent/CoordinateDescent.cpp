@@ -186,9 +186,6 @@ void input_data(double* eps, int* max_steps, double* vars, double* range)
     std::cout << "Введите значение погрешности: ";
     std::cin >> *eps;
 
-    double step = 0;
-    std::cout << "Введите величину шага: ";
-    std::cin >> step;
     std::cout << "Введите максимальное количество шагов: ";
     std::cin >> *max_steps;
     for (int i = 0; i < var_count; i++) {
