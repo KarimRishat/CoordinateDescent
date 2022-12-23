@@ -140,10 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CoordinateDescent.cpp" />
-    <ClCompile Include="Descent_MethClass.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Descent_MethClass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
